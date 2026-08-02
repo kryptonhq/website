@@ -1,0 +1,155 @@
+---
+// The hero backdrop: an isometric crystal lattice, echoing the node
+// cube inside the Krypton mark (and, conveniently, the element it is
+// named after). Built from three repeating gradients rather than an
+// image so it stays razor-sharp at any density and costs nothing to
+// download. The hexagon ring is the mark's outer silhouette, ghosted.
+---
+
+<div class="lattice" aria-hidden="true">
+  <div class="lattice__grid"></div>
+  <svg class="lattice__ring" viewBox="0 0 200 200" fill="none">
+    <path
+      d="M100 20 L169.28 60 L169.28 140 L100 180 L30.72 140 L30.72 60 Z"
+      stroke="currentColor"
+      stroke-width="0.6"></path>
+    <path
+      d="M100 42 L150.23 71 L150.23 129 L100 158 L49.77 129 L49.77 71 Z"
+      stroke="currentColor"
+      stroke-width="0.4"></path>
+  </svg>
+  <span class="lattice__node" style="--x: 18%; --y: 28%; --d: 0s"></span>
+  <span class="lattice__node" style="--x: 74%; --y: 20%; --d: 1.1s"></span>
+  <span class="lattice__node" style="--x: 88%; --y: 62%; --d: 2.3s"></span>
+  <span class="lattice__node" style="--x: 32%; --y: 74%; --d: 3.1s"></span>
+  <span class="lattice__node" style="--x: 58%; --y: 46%; --d: 1.7s"></span>
+  <div class="lattice__glow lattice__glow--indigo"></div>
+  <div class="lattice__glow lattice__glow--teal"></div>
+</div>
+
+<style>
+  .lattice {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Three gradient sets at 30° / -30° / 90° intersect into a true
+     isometric mesh. The mask fades it out before it reaches the text. */
+  .lattice__grid {
+    position: absolute;
+    inset: -20%;
+    background-image:
+      repeating-linear-gradient(
+        30deg,
+        rgb(139 152 181 / 0.16) 0 1px,
+        transparent 1px 68px
+      ),
+      repeating-linear-gradient(
+        -30deg,
+        rgb(139 152 181 / 0.16) 0 1px,
+        transparent 1px 68px
+      ),
+      repeating-linear-gradient(
+        90deg,
+        rgb(139 152 181 / 0.1) 0 1px,
+        transparent 1px 118px
+      );
+    mask-image: radial-gradient(
+      ellipse 80% 70% at 50% 34%,
+      #000 0%,
+      rgb(0 0 0 / 0.55) 42%,
+      transparent 78%
+    );
+    animation: lattice-drift 44s linear infinite;
+  }
+
+  @keyframes lattice-drift {
+    to {
+      transform: translate3d(-118px, -68px, 0);
+    }
+  }
+
+  .lattice__ring {
+    position: absolute;
+    top: -14%;
+    right: -8%;
+    width: min(58vw, 720px);
+    aspect-ratio: 1;
+    color: var(--kr-indigo-500);
+    opacity: 0.22;
+    animation: ring-breathe 14s var(--kr-ease) infinite;
+  }
+
+  @keyframes ring-breathe {
+    0%,
+    100% {
+      opacity: 0.14;
+      transform: scale(1) rotate(0deg);
+    }
+    50% {
+      opacity: 0.26;
+      transform: scale(1.035) rotate(3deg);
+    }
+  }
+
+  /* Lattice sites: a few points that pulse out of phase, so the field
+     reads as live telemetry rather than wallpaper. */
+  .lattice__node {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--kr-indigo-400);
+    box-shadow: 0 0 0 0 rgb(129 140 248 / 0.5);
+    animation: node-pulse 5.5s var(--kr-ease) infinite;
+    animation-delay: var(--d);
+  }
+
+  @keyframes node-pulse {
+    0%,
+    70%,
+    100% {
+      box-shadow: 0 0 0 0 rgb(129 140 248 / 0.45);
+      opacity: 0.55;
+    }
+    35% {
+      box-shadow: 0 0 0 14px rgb(129 140 248 / 0);
+      opacity: 1;
+    }
+  }
+
+  .lattice__glow {
+    position: absolute;
+    width: 46rem;
+    height: 46rem;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.16;
+  }
+
+  .lattice__glow--indigo {
+    top: -22rem;
+    left: -12rem;
+    background: var(--kr-indigo-500);
+  }
+
+  .lattice__glow--teal {
+    bottom: -30rem;
+    right: -14rem;
+    background: var(--kr-teal-500);
+    opacity: 0.1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lattice__grid,
+    .lattice__ring,
+    .lattice__node {
+      animation: none;
+    }
+  }
+</style>

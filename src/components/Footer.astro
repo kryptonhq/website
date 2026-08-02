@@ -1,0 +1,76 @@
+---
+import mark from '../assets/mark-dark.svg';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="shell">
+    <div class="footer__grid">
+      <div>
+        <a class="footer__brand" href="/">
+          <img src={mark.src} alt="" width="24" height="24" />
+          Krypton
+        </a>
+        <p class="footer__tag">
+          Open-source projects for Kubernetes, developed on GitHub under
+          Apache-2.0.
+        </p>
+      </div>
+
+      <div class="footer__col" data-product="runtime">
+        <h2>Runtime</h2>
+        <ul>
+          <li><a href="/runtime/">Documentation</a></li>
+          <li><a href="/runtime/getting-started/installation/">Install</a></li>
+          <li>
+            <a
+              href="https://github.com/kryptonhq/runtime/releases"
+              rel="noopener">Releases</a
+            >
+          </li>
+          <li>
+            <a href="https://github.com/kryptonhq/runtime" rel="noopener"
+              >Source</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      <div class="footer__col" data-product="loupe">
+        <h2>Loupe</h2>
+        <ul>
+          <li><a href="/loupe/">Documentation</a></li>
+          <li>
+            <a
+              href="https://github.com/kryptonhq/loupe/releases/latest"
+              rel="noopener">Download</a
+            >
+          </li>
+          <li>
+            <a href="https://github.com/kryptonhq/loupe" rel="noopener"
+              >Source</a
+            >
+          </li>
+        </ul>
+      </div>
+
+      {/* Org-level only. Anything that differs between the two projects
+          — contributing guides, releases, issue trackers — belongs in
+          that project's own column, not here. */}
+      <div class="footer__col">
+        <h2>Project</h2>
+        <ul>
+          <li>
+            <a href="https://github.com/kryptonhq" rel="noopener">GitHub</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__base">
+      <span>© {year} The Krypton Authors</span>
+      <span>Apache-2.0</span>
+    </div>
+  </div>
+</footer>

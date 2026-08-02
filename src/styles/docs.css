@@ -1,0 +1,166 @@
+/* ------------------------------------------------------------------
+   Starlight, wearing the Krypton palette.
+
+   Starlight's own custom properties are re-pointed at the tokens in
+   tokens.css so the docs and the landing page share one set of
+   neutrals, one accent mechanism and one type stack. Pages that belong
+   to Loupe override --kr-accent in their frontmatter `head`, and
+   everything downstream — links, sidebar marker, code borders —
+   follows without another rule.
+   ------------------------------------------------------------------ */
+
+:root {
+  --sl-font: var(--kr-font-display);
+  --sl-font-mono: var(--kr-font-mono);
+
+  /* `--sl-color-accent-low` must stay opaque: Starlight uses it as the
+     TEXT colour on the accent-filled current sidebar link, so a
+     translucent value renders the label invisible. Mix toward the page
+     background instead of reusing --kr-accent-soft. */
+  --sl-color-accent-low: color-mix(
+    in srgb,
+    var(--kr-accent) 22%,
+    var(--kr-ink)
+  );
+  --sl-color-accent: var(--kr-accent-strong);
+  --sl-color-accent-high: var(--kr-accent);
+
+  --sl-color-white: var(--kr-text);
+  --sl-color-gray-1: #d3d8e4;
+  --sl-color-gray-2: #b3bacb;
+  --sl-color-gray-3: var(--kr-text-muted);
+  --sl-color-gray-4: #59617563;
+  --sl-color-gray-5: var(--kr-surface-3);
+  --sl-color-gray-6: var(--kr-surface-2);
+  --sl-color-gray-7: var(--kr-surface-1);
+  --sl-color-black: var(--kr-ink);
+
+  --sl-color-bg: var(--kr-ink);
+  --sl-color-bg-nav: color-mix(in srgb, var(--kr-ink) 82%, transparent);
+  --sl-color-bg-sidebar: var(--kr-ink);
+  --sl-color-hairline: var(--kr-line);
+  --sl-color-hairline-light: var(--kr-line);
+  --sl-color-hairline-shade: var(--kr-line);
+
+  --sl-color-text-accent: var(--kr-accent);
+  --sl-nav-height: 3.75rem;
+}
+
+:root[data-theme='light'] {
+  --sl-color-gray-1: #1c2230;
+  --sl-color-gray-2: #333c50;
+  --sl-color-gray-3: var(--kr-text-muted);
+  --sl-color-gray-4: #8a93a980;
+  --sl-color-gray-5: var(--kr-surface-3);
+  --sl-color-gray-6: var(--kr-surface-2);
+  --sl-color-gray-7: var(--kr-surface-1);
+  --sl-color-white: var(--kr-text);
+  --sl-color-black: #ffffff;
+  --sl-color-accent-low: color-mix(in srgb, var(--kr-accent) 16%, #fff);
+}
+
+/* Asides. Note and tip belong to the product's own accent — Starlight's
+   defaults are blue and purple, which would introduce a third and
+   fourth brand colour on a page already colour-coded by product.
+   Caution and danger keep their warning hues, because there the colour
+   is carrying meaning rather than identity. */
+.starlight-aside--note,
+.starlight-aside--tip {
+  --sl-color-asides-text-accent: var(--kr-accent);
+  --sl-color-asides-border: var(--kr-accent);
+  background: var(--kr-accent-soft);
+}
+
+/* The nav bar reads as a status strip: translucent, hairline-ruled,
+   with the brand mark tight against a mono wordmark. */
+.site-title {
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+header.header {
+  backdrop-filter: blur(14px) saturate(160%);
+  border-bottom: 1px solid var(--kr-line);
+}
+
+/* Headings borrow the landing page's tight display tracking so a docs
+   page and the home page look like the same publication. */
+.sl-markdown-content :is(h1, h2, h3, h4) {
+  letter-spacing: -0.022em;
+  font-weight: 650;
+}
+
+.sl-markdown-content h2 {
+  padding-top: 0.35em;
+  border-top: 1px solid var(--kr-line);
+}
+
+.sl-markdown-content h2:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+/* Inline code should look like a token, not a highlight. */
+.sl-markdown-content
+  :not(pre, astro-island)
+  > code:not(:where(.not-content *)) {
+  background: var(--kr-accent-soft);
+  border: 1px solid var(--kr-line);
+  border-radius: 5px;
+  color: var(--kr-accent);
+  font-size: 0.875em;
+  padding: 0.1em 0.38em;
+}
+
+/* Expressive Code frames, quieted to match the terminal on the home
+   page rather than shouting with their own chrome. */
+.expressive-code .frame {
+  --ec-brdCol: var(--kr-line);
+  --ec-frm-edBg: var(--kr-surface-1);
+  --ec-frm-trmBg: var(--kr-surface-1);
+  --ec-frm-edTabBarBg: var(--kr-surface-2);
+  --ec-frm-trmTtbBg: var(--kr-surface-2);
+  --ec-frm-edActTabBg: var(--kr-surface-1);
+  border-radius: var(--kr-radius-sm);
+}
+
+/* Tables get the same hairline grid as the landing page's spec rows. */
+.sl-markdown-content table {
+  border-collapse: collapse;
+  font-size: 0.925rem;
+}
+
+.sl-markdown-content :is(th, td) {
+  border-color: var(--kr-line);
+}
+
+.sl-markdown-content th {
+  font-family: var(--kr-font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--kr-text-muted);
+}
+
+/* Starlight already fills the current sidebar link with the accent and
+   puts white text on it — do not restyle its colour here, or the label
+   ends up the same colour as the block behind it. */
+
+/* Starlight tints card icons from its own pastel set, which reads as a
+   third brand alongside indigo and teal. Put them back on the accent. */
+.card .icon {
+  background: var(--kr-accent-soft);
+  color: var(--kr-accent);
+}
+
+/* Screenshots in the docs sit on the page rather than floating on it. */
+.sl-markdown-content img:not(:where(.not-content *)) {
+  border: 1px solid var(--kr-line);
+  border-radius: var(--kr-radius-sm);
+}
+
+/* A "back to the landing page" affordance, since / is not a docs route. */
+.site-title::after {
+  content: '';
+}

@@ -1,0 +1,237 @@
+---
+title: Loupe
+description: An Apache-2.0 desktop client for Kubernetes, built on the API server's discovery and table-printing endpoints. Installation, capabilities and current limitations.
+topic: loupe
+head:
+  # Retheme this page to Loupe's teal. `:root:root` outweighs the
+  # `:root[data-theme='light']` block in tokens.css regardless of which
+  # stylesheet the bundler emits last.
+  - tag: style
+    content: |
+      :root:root {
+        --kr-accent: var(--kr-teal-400);
+        --kr-accent-strong: var(--kr-teal-500);
+        --kr-accent-soft: rgb(45 212 191 / 0.14);
+      }
+      :root:root[data-theme='light'] {
+        --kr-accent: var(--kr-teal-600);
+        --kr-accent-strong: var(--kr-teal-600);
+        --kr-accent-soft: rgb(13 148 136 / 0.1);
+      }
+---
+
+import { Tabs, TabItem, Aside, Steps } from '@astrojs/starlight/components';
+
+Loupe is a desktop client for Kubernetes, licensed Apache-2.0. It reads
+the kubeconfig `kubectl` already uses and issues requests directly to
+the API server from your machine.
+
+It is a [Tauri](https://tauri.app/) application: a React and TypeScript
+frontend over a Rust core that holds the client connection. Builds are
+published for macOS, Linux and Windows, and it works against any
+conformant Kubernetes cluster — managed, self-hosted, or a local kind
+or OrbStack cluster.
+
+## Architecture
+
+Loupe has no in-cluster component. There is no operator to install, no
+service account to create, and no telemetry.
+
+Every request originates from the machine running the app, using the
+credentials in the selected kubeconfig context. Authorisation is
+therefore whatever RBAC already grants that user: Loupe can read what
+`kubectl` can read, and is refused the same things.
+
+Resource types are resolved through the API server's discovery
+endpoints rather than a compiled-in list, and lists are requested as
+`application/json;as=Table;g=meta.k8s.io;v=v1` so the server returns
+the same rows and printer columns that `kubectl get` renders. Custom
+resources are handled by the same path as built-in kinds, which is why
+a CRD installed after the binary was built needs no upgrade to browse.
+
+## Install
+
+Loupe ships as a native binary for macOS, Linux and Windows. The current
+release is **v0.1.0**.
+
+<Tabs syncKey="os">
+  <TabItem label="macOS" icon="apple">
+
+### macOS
+
+The cask resolves the correct architecture:
+
+```bash
+brew install --cask kryptonhq/tap/loupe
+```
+
+Alternatively, download a `.dmg` from the
+[latest release](https://github.com/kryptonhq/loupe/releases/latest) —
+`aarch64` for Apple Silicon, `x64` for Intel. The architectures are
+built separately rather than as a universal binary, so each download
+contains one slice.
+
+<Aside type="caution" title="First launch requires an additional step">
+macOS builds are ad-hoc signed but not notarised, so Gatekeeper blocks
+the first launch. Either:
+
+- open **System Settings → Privacy & Security** and select **Open
+  Anyway**, or
+- install with `brew install --cask --no-quarantine kryptonhq/tap/loupe`.
+
+The cask documents this in its caveats and does not remove the
+quarantine attribute in a `postflight`.
+</Aside>
+
+  </TabItem>
+  <TabItem label="Linux" icon="linux">
+
+### Linux
+
+Three formats are published per release, available from the
+[latest release](https://github.com/kryptonhq/loupe/releases/latest):
+
+| Format | Install |
+| --- | --- |
+| `.deb` | `sudo apt install ./Loupe_<version>_amd64.deb` |
+| `.rpm` | `sudo dnf install ./Loupe-<version>-1.x86_64.rpm` |
+| `.AppImage` | `chmod +x Loupe_<version>_amd64.AppImage && ./Loupe_<version>_amd64.AppImage` |
+
+Builds are produced on Ubuntu 22.04. The binary links against the glibc
+of its build host, so building on a newer runner would raise the
+minimum glibc required to start.
+
+  </TabItem>
+  <TabItem label="Windows" icon="seti:windows">
+
+### Windows
+
+Download either installer from the
+[latest release](https://github.com/kryptonhq/loupe/releases/latest):
+
+- `Loupe_<version>_x64_en-US.msi` — the MSI package
+- `Loupe_<version>_x64-setup.exe` — the NSIS installer
+
+<Aside type="caution">
+The installers are unsigned, so SmartScreen warns on first run. Select
+**More info → Run anyway**.
+</Aside>
+
+  </TabItem>
+</Tabs>
+
+## First run
+
+<Steps>
+
+1. **Start Loupe.** It reads `~/.kube/config` — the same file `kubectl`
+   uses — and lists every context it finds.
+
+2. **Pick a context.** Loupe connects using that context's credentials.
+   Whatever `kubectl` can see, Loupe can see; whatever RBAC forbids,
+   Loupe cannot.
+
+3. **Browse.** Nodes, namespaces and pods have dedicated views. All
+   other kinds are listed from the server-rendered table.
+
+</Steps>
+
+Connections are held per context, so switching cluster does not restart
+the application or discard the previous connection.
+
+## Capabilities
+
+### Resource browsing
+
+- Kubeconfig context discovery, connection, and switching between
+  contexts
+- Dedicated views for nodes, namespaces and pods, with search and
+  paging
+- Workloads, networking, config and storage — deployments,
+  statefulsets, daemonsets, replicasets, jobs, cronjobs, services,
+  ingresses, network policies, config maps, secrets, service accounts
+  and persistent volume claims
+- Custom resources, resolved through API discovery and rendered with
+  the printer columns declared in the CRD
+
+### Detail views
+
+- **Pod** — containers, termination reasons, conditions, labels, events
+  and the full manifest
+- **Node** — allocated CPU and memory against allocatable, taints,
+  pressure conditions, and the pods bound to the node
+- **Namespace** — pod phase counts, ResourceQuota utilisation,
+  remaining finalizers on a terminating namespace, and the resources it
+  contains
+
+![Node detail showing allocated CPU and memory against allocatable](/img/node-detail.png)
+
+### Logs
+
+- Pod logs streamed from the API server, with container selection,
+  timestamps, and `previous` for a terminated container's logs
+
+### Secrets
+
+- Keys and byte sizes are listed without retrieving values. Each value
+  is fetched individually on request, and the YAML view redacts `data`.
+
+### Helm
+
+- Release values, rendered manifests, notes and revision history are
+  decoded from the release Secrets. The `helm` binary is not invoked.
+
+### Editing
+
+- The YAML view writes back with a full replace, so a concurrent
+  modification is rejected by the API server rather than silently
+  overwritten
+
+### Appearance
+
+- Light, dark, or system-following, persisted in `settings.json`
+  alongside the application's other configuration
+
+## Not yet implemented
+
+As of v0.1.0:
+
+- **Deletion.** Intentionally deferred until it can name the objects it
+  will remove in a confirmation step.
+- **`exec` into a container.**
+- **Multiple simultaneous clusters.** One context is connected at a
+  time.
+- **Owner-reference navigation** — from a deployment to its pods, a
+  service to its endpoints, a claim to its volume.
+
+## Building from source
+
+```bash
+git clone https://github.com/kryptonhq/loupe
+cd loupe
+pnpm install
+pnpm tauri dev
+```
+
+`pnpm dev` alone serves the frontend in a browser, where the Tauri
+bridge is absent. In that case the UI falls back to the fixtures in
+`src/dev/fixtures.ts`, allowing layout work without a cluster. That
+path is development-only and is excluded from production builds.
+
+## Contributing
+
+Loupe uses the [DCO](https://developercertificate.org/) rather than a
+CLA. Sign commits with `git commit -s`; contributors retain their
+copyright.
+
+- [CONTRIBUTING.md](https://github.com/kryptonhq/loupe/blob/main/CONTRIBUTING.md) — development setup and pull request process
+- [GOVERNANCE.md](https://github.com/kryptonhq/loupe/blob/main/GOVERNANCE.md) — decision-making and maintainership
+- [SECURITY.md](https://github.com/kryptonhq/loupe/blob/main/SECURITY.md) — vulnerability disclosure process
+
+The project follows the
+[CNCF Code of Conduct](https://github.com/cncf/foundation/blob/main/code-of-conduct.md).
+
+## Licence
+
+Apache 2.0. See
+[LICENSE](https://github.com/kryptonhq/loupe/blob/main/LICENSE).

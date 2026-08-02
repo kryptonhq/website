@@ -1,0 +1,95 @@
+---
+title: Krypton Runtime
+description: Kubernetes-native serving for AI agents, self-hosted LLMs and MCP servers. Start here for concepts, tutorials, operations and reference.
+topic: runtime
+---
+
+import { LinkCard } from '@astrojs/starlight/components';
+
+Krypton Runtime is a Kubernetes-native runtime for AI agents,
+self-hosted LLMs, and MCP servers.
+
+For **agents**, it turns A2A, plain HTTP, and framework-backed
+containers into cluster resources with stable gateway routing, lifecycle
+management, scaling signals, and observability.
+
+For **model serving**, a `Model` custom resource becomes a llama.cpp
+deployment: Krypton pulls GGUF weights from Hugging Face and exposes the
+result through OpenAI-compatible API paths (`/v1/models`,
+`/v1/chat/completions`, `/v1/completions`, `/v1/embeddings`). Your
+applications keep using familiar SDKs while operators manage models as
+ordinary Kubernetes resources.
+
+For **MCP**, Krypton runs HTTP-transport servers directly, or bridges
+stdio servers into the same agent gateway and UI introspection path.
+
+## Fast path
+
+<LinkCard
+  title="Install Krypton"
+  href="/runtime/getting-started/installation/"
+  description="Helm install, health check, and a no-secrets agent in two commands."
+/>
+
+## What it does
+
+| Capability | What you get |
+| ---------- | ------------ |
+| **Agents** | Run A2A, MCP, or plain HTTP containers with an `Agent` CRD. Bring LangGraph, Google ADK, custom services, or your own image. |
+| **Self-hosted LLMs** | Run Hugging Face GGUF models with llama.cpp using a `Model` CRD and OpenAI-compatible `/v1/models` and `/v1/chat/completions` routes. |
+| **MCP servers** | Host native HTTP MCP servers, or wrap stdio MCP binaries with the bundled `mcp-stdio-bridge`. |
+| **Gateway routing** | One public gateway handles agent invocation, model routing, streaming responses, and protocol-specific paths. |
+| **Operator UI** | A lightweight control-plane UI lists agents, models, status, and MCP tools. |
+| **Scaling signals** | Per-pod sidecars enforce concurrency, expose in-flight counts, and feed the scaler. |
+| **Observability** | Prometheus metrics for gateway traffic, model calls, sidecar load, scaler decisions, and control-plane health. |
+| **Helm-first install** | Install the runtime as a single OCI Helm chart and keep ingress, TLS, auth, and rate limiting in your existing platform layer. |
+
+## Quickstart
+
+Install Krypton:
+
+```bash
+helm install krypton oci://ghcr.io/kryptonhq/charts/krypton \
+  --namespace krypton-system \
+  --create-namespace
+```
+
+Deploy the no-secrets helloworld agent:
+
+```bash
+kubectl apply -f https://raw.githubusercontent.com/kryptonhq/runtime/main/examples/agent/python/helloworld/agent.yaml
+kubectl -n krypton-system port-forward svc/krypton-gateway 8080:8080 &
+```
+
+Invoke it through the gateway:
+
+```bash
+curl -X POST http://localhost:8080/v1/agents/agents/helloworld/ \
+  -H 'Content-Type: application/json' \
+  -d '{"jsonrpc":"2.0","id":"1","method":"message/send",
+       "params":{"message":{"messageId":"m1","role":"user",
+       "parts":[{"kind":"text","text":"ping"}]}}}'
+```
+
+Open the operator UI:
+
+```bash
+kubectl -n krypton-system port-forward svc/krypton-control-plane 8090:8090
+open http://localhost:8090/ui/
+```
+
+## Try an LLM
+
+```bash
+kubectl create ns models --dry-run=client -o yaml | kubectl apply -f -
+kubectl apply -f https://raw.githubusercontent.com/kryptonhq/runtime/main/config/samples/llm/qwen2.5-0.5b.yaml
+
+curl -s http://localhost:8080/v1/models | jq
+```
+
+Any OpenAI SDK can use `http://localhost:8080/v1` as its `base_url`.
+
+## Source
+
+Krypton Runtime is Apache-2.0 and developed at
+[github.com/kryptonhq/runtime](https://github.com/kryptonhq/runtime).

@@ -1,0 +1,91 @@
+---
+title: Installation
+description: Install Krypton with Helm and deploy a no-secrets agent in two commands.
+sidebar:
+  order: 1
+topic: runtime
+---
+
+import { Aside, Steps } from '@astrojs/starlight/components';
+
+Krypton ships as a single Helm chart with four components: **manager**
+(controller + scaler), **control plane** (REST API + UI), **gateway**
+(public ingress + activator), and a **per-pod proxy sidecar** the
+manager injects into agent pods.
+
+## 1. Install the chart
+
+```bash
+helm install krypton oci://ghcr.io/kryptonhq/charts/krypton \
+  --namespace krypton-system \
+  --create-namespace \
+  --set controlPlane.databaseUrl="postgres://user:pass@host:5432/db"
+```
+
+This installs the most recent chart; its `appVersion` pins the matching
+image tags. To pin a specific release, pass `--version 0.0.4` (latest
+stable is **v0.0.4**).
+
+`controlPlane.databaseUrl` points at a managed Postgres for the
+agent-registry mirror. Leave it empty to use an in-memory store —
+acceptable for dev or single-replica installs.
+
+For production you will front the `krypton-gateway` Service with an L7
+ingress (Gateway API, Nginx, and so on), covered in
+**Bring your own ingress** once you have an agent running.
+
+## 2. Open the UI and confirm health
+
+The control plane serves a small operator UI:
+
+```bash
+kubectl -n krypton-system port-forward svc/krypton-control-plane 8090:8090
+open http://localhost:8090/ui/
+```
+
+You should land on an **Agents** list (empty) and an **MCP servers**
+list (empty). If the page renders and both lists load without errors,
+the manager, control plane and Postgres mirror are all healthy.
+
+<Aside type="note" title="Ports refresher">
+`:8090` is operator tooling only. Agent traffic goes through the gateway
+on `:8080`.
+</Aside>
+
+## 3. Deploy the helloworld agent
+
+`examples/agent/python/helloworld` is an A2A agent that echoes its
+input. It requires no LLM and no secrets, so it exercises the full
+request path without additional configuration.
+
+<Steps>
+
+1. Apply the agent and forward the gateway:
+
+   ```bash
+   kubectl apply -f https://raw.githubusercontent.com/kryptonhq/runtime/main/examples/agent/python/helloworld/agent.yaml
+   kubectl -n krypton-system port-forward svc/krypton-gateway 8080:8080 &
+   ```
+
+2. Invoke it:
+
+   ```bash
+   curl -X POST http://localhost:8080/v1/agents/agents/helloworld/ \
+        -H 'Content-Type: application/json' \
+        -d '{"jsonrpc":"2.0","id":"1","method":"message/send",
+             "params":{"message":{"messageId":"m1","role":"user",
+               "parts":[{"kind":"text","text":"ping"}]}}}'
+   ```
+
+3. You should get back:
+
+   ```json
+   { "result": { "artifacts": [{ "parts": [{ "kind": "text",
+      "text": "Hello, World! I have received your request (ping)" }]}],
+      "status": { "state": "completed" } } }
+   ```
+
+</Steps>
+
+The agent is also visible in the UI now, with `Phase: Ready` and the
+Invoke widget pre-populated against the same gateway endpoint.

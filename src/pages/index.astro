@@ -1,0 +1,289 @@
+---
+import Landing from '../layouts/Landing.astro';
+import Nav from '../components/Nav.astro';
+import Lattice from '../components/Lattice.astro';
+import Terminal from '../components/Terminal.astro';
+import Footer from '../components/Footer.astro';
+
+// Bumped by hand at release time. The runtime docs carry the same
+// number in their own frontmatter; see MIGRATION.md for the note on
+// wiring this back up to the runtime repo's bump-version workflow.
+const RUNTIME_VERSION = 'v0.0.4';
+const LOUPE_VERSION = 'v0.1.0';
+
+const runtimeFeatures = [
+  {
+    title: 'Ship an agent with one manifest',
+    body: 'Bring a LangGraph, Google ADK or plain HTTP container. One <code>Agent</code> resource gives it a stable endpoint, lifecycle management and scaling — no bespoke Deployment, Service and ingress per agent.',
+  },
+  {
+    title: 'Self-host an LLM without a second stack',
+    body: 'Point a <code>Model</code> at a Hugging Face GGUF file. Krypton pulls the weights and serves them, so there is no separate inference platform to run alongside Kubernetes.',
+  },
+  {
+    title: 'Your OpenAI SDK, your cluster',
+    body: 'Change <code>base_url</code> and existing code works unchanged against models you host: <code>/v1/models</code>, <code>/v1/chat/completions</code>, <code>/v1/completions</code> and <code>/v1/embeddings</code>.',
+  },
+  {
+    title: 'MCP servers, stdio ones too',
+    body: 'HTTP MCP servers run as they are. Stdio binaries run behind a bundled bridge, and the operator UI lists the tools each server exposes so you can see what an agent can reach.',
+  },
+  {
+    title: 'Keep the ingress you already run',
+    body: 'The gateway is a ClusterIP Service, so TLS, authentication and rate limiting stay where your platform team already does them — Gateway API, Nginx, Envoy or a cloud load balancer.',
+  },
+  {
+    title: 'Visible to the monitoring you have',
+    body: 'Gateway invocations, request latency, replica counts, scaler decisions and per-pod load are exported as <code>krypton_*</code> Prometheus series. A starter Grafana dashboard ships in the repository.',
+  },
+];
+
+// Hand-tokenised rather than run through a syntax highlighter: it is
+// four commands, and the classes (.c comment, .p prompt, .k command,
+// .s string, .o flag) are defined in Terminal.astro.
+const runtimeDemo = `<span class="c"># 1. Install the runtime</span>
+<span class="p">$</span> <span class="k">helm</span> install krypton oci://ghcr.io/kryptonhq/charts/krypton \\
+    <span class="o">--namespace</span> krypton-system <span class="o">--create-namespace</span>
+
+<span class="c"># 2. Deploy an agent — no secrets required</span>
+<span class="p">$</span> <span class="k">kubectl</span> apply -f <span class="s">examples/agent/python/helloworld/agent.yaml</span>
+
+<span class="c"># 3. Serve a GGUF model from Hugging Face</span>
+<span class="p">$</span> <span class="k">kubectl</span> apply -f <span class="s">config/samples/llm/qwen2.5-0.5b.yaml</span>
+
+<span class="c"># 4. Call the model through the OpenAI-compatible API</span>
+<span class="p">$</span> <span class="k">curl</span> localhost:8080/v1/chat/completions \\
+    -d <span class="s">'{"model":"qwen2-0-5b","messages":[…]}'</span>`;
+
+const loupeFeatures = [
+  {
+    title: 'Every context, one switch away',
+    body: 'Your kubeconfig contexts are all there on launch. Move between a local kind cluster and production without reconnecting, re-authenticating or opening a second window.',
+  },
+  {
+    title: 'Your CRDs, not just the built-in kinds',
+    body: 'Custom resources sit alongside deployments and pods, with the columns their authors defined. Install a CRD today and browse it today — no Loupe release required.',
+  },
+  {
+    title: 'Answers on the detail page',
+    body: 'Why a pod is crash-looping, how much CPU a node has actually committed, which finalizer is holding a namespace in <code>Terminating</code> — without going back to the terminal.',
+  },
+  {
+    title: 'Helm releases without the CLI',
+    body: 'Values, rendered manifests, notes and the full revision history for every release in the cluster — no <code>helm</code> binary and no scrolling back through <code>helm history</code>.',
+  },
+  {
+    title: 'Logs, including the container that died',
+    body: 'Stream live with container selection and timestamps, or read the previous container’s logs to find out what killed it.',
+  },
+];
+---
+
+<Landing
+  title="Krypton — open-source projects for Kubernetes"
+  description="Krypton Runtime deploys AI agents, self-hosted LLMs and MCP servers on Kubernetes with the manifests and tooling you already use. Loupe is a desktop client for reading and operating any Kubernetes cluster. Both Apache-2.0."
+>
+  <Nav />
+
+  <main id="main">
+    {/* ---------------------------------------------------------- */}
+    {/* Hero                                                         */}
+    {/* ---------------------------------------------------------- */}
+    <section class="hero">
+      <Lattice />
+      <div class="shell hero__inner">
+        <div class="stagger">
+          <p class="hero__eyebrow" style="--i: 0">
+            Open source · Apache-2.0
+          </p>
+
+          {/* One line per project. They are described in parallel and
+              never in terms of each other — see MIGRATION.md. That is a
+              constraint on the writing, not a thing to write about. */}
+          <h1 class="hero__title" style="--i: 1">
+            <span class="l1">Serve <em>AI workloads</em> on Kubernetes.</span>
+            <span class="l2">Inspect clusters from the <em>desktop</em>.</span>
+          </h1>
+
+          <p class="hero__lede" style="--i: 2">
+            Two open-source projects. <strong>Krypton Runtime</strong> lets you
+            deploy AI agents, self-hosted LLMs and MCP servers with the
+            manifests and tooling you already use, and reach them on stable
+            endpoints. <strong>Loupe</strong> is a desktop client for reading
+            and operating any Kubernetes cluster.
+          </p>
+
+          <div class="hero__actions" style="--i: 3">
+            <a class="btn btn--solid" href="/runtime/" data-product="runtime">
+              Deploy the runtime
+              <span class="btn__arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="btn" href="/loupe/" data-product="loupe">
+              Get Loupe
+              <span class="btn__arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="btn" href="https://github.com/kryptonhq" rel="noopener">
+              GitHub
+            </a>
+          </div>
+
+          <dl class="specbar" style="--i: 4">
+            <div class="specbar__cell" data-product="runtime">
+              <dt class="specbar__k">Runtime</dt>
+              <dd class="specbar__v">{RUNTIME_VERSION}</dd>
+            </div>
+            <div class="specbar__cell" data-product="loupe">
+              <dt class="specbar__k">Loupe</dt>
+              <dd class="specbar__v">{LOUPE_VERSION}</dd>
+            </div>
+            <div class="specbar__cell">
+              <dt class="specbar__k">Built with</dt>
+              <dd class="specbar__v">Go · Rust</dd>
+            </div>
+            <div class="specbar__cell">
+              <dt class="specbar__k">Licence</dt>
+              <dd class="specbar__v">Apache-2.0</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------- */}
+    {/* 01 — Runtime                                                 */}
+    {/* ---------------------------------------------------------- */}
+    <section class="section" data-product="runtime" id="runtime">
+      <div class="shell">
+        <div class="product">
+          <div class="product__copy" data-reveal>
+            <p class="section__marker">01 / Krypton Runtime</p>
+            <h2 class="section__title">
+              Run AI workloads the way you run everything else.
+            </h2>
+            <p class="section__lede">
+              Declare an <code>Agent</code> or a <code>Model</code> and it
+              behaves like the rest of your cluster: the same manifests, the
+              same <code>kubectl</code>, the same RBAC, the same metrics.
+              One gateway handles agent invocation, model routing and
+              streaming, so callers get a stable endpoint whatever is behind
+              it.
+            </p>
+
+            <ul class="features">
+              {
+                runtimeFeatures.map((f, i) => (
+                  <li>
+                    <span class="features__n">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span>
+                      <span class="features__t">{f.title}</span>
+                      <span class="features__d" set:html={f.body} />
+                    </span>
+                  </li>
+                ))
+              }
+            </ul>
+
+            <div class="hero__actions">
+              <a class="btn btn--solid" href="/runtime/getting-started/installation/">
+                Install with Helm
+                <span class="btn__arrow" aria-hidden="true">→</span>
+              </a>
+              <a class="btn" href="/runtime/">Read the docs</a>
+            </div>
+          </div>
+
+          <div class="product__aside" data-reveal>
+            <div class="product__sticky">
+              <Terminal title="krypton ~ zsh" html={runtimeDemo} />
+              <p class="frame__caption">
+                Chart installation, an agent, a model, and a chat completion
+                request routed through the gateway.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {/* ---------------------------------------------------------- */}
+    {/* 02 — Loupe                                                   */}
+    {/* ---------------------------------------------------------- */}
+    <section class="section" data-product="loupe" id="loupe">
+      {/* Loupe is a thing you look at, so its block is laid out around
+          the app rather than beside it: a wide showcase, then the
+          feature list in two columns underneath. */}
+      <div class="shell">
+        <div class="showcase__head" data-reveal>
+          <p class="section__marker">02 / Loupe</p>
+          <h2 class="section__title section__title--wide">
+            A desktop client for Kubernetes.
+          </h2>
+          <p class="section__lede">
+            Open it, pick a context, and you are looking at your cluster.
+            Loupe uses the kubeconfig you already have, so there is nothing
+            to install in the cluster, no account to create and no telemetry.
+            Native builds for macOS, Linux and Windows.
+          </p>
+
+          <div class="hero__actions">
+            <a class="btn btn--solid" href="/loupe/#install">
+              Download {LOUPE_VERSION}
+              <span class="btn__arrow" aria-hidden="true">→</span>
+            </a>
+            <a class="btn" href="/loupe/">Read the docs</a>
+          </div>
+
+          <div class="dl">
+            <a href="/loupe/#macos">macOS</a>
+            <a href="/loupe/#linux">Linux</a>
+            <a href="/loupe/#windows">Windows</a>
+          </div>
+        </div>
+
+        <figure class="showcase" data-reveal>
+          <div class="frame">
+            <div class="frame__bar">
+              <span class="frame__dot" style="background:#ff5f57"></span>
+              <span class="frame__dot" style="background:#febc2e"></span>
+              <span class="frame__dot" style="background:#28c840"></span>
+              <span class="frame__title">Loupe — pods</span>
+            </div>
+            <img
+              src="/img/pods.png"
+              width="1280"
+              height="820"
+              loading="lazy"
+              decoding="async"
+              alt="Loupe showing a pod list with namespace, status, ready, restart and node columns"
+            />
+          </div>
+          <figcaption class="frame__caption">
+            Pods across every namespace, with status and restart counts at a
+            glance. Screenshots use demo data, not a live cluster.
+          </figcaption>
+        </figure>
+
+        <ul class="features features--split" data-reveal>
+          {
+            loupeFeatures.map((f, i) => (
+              <li>
+                <span class="features__n">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+                <span>
+                  <span class="features__t">{f.title}</span>
+                  <span class="features__d" set:html={f.body} />
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+  </main>
+
+  <Footer />
+</Landing>

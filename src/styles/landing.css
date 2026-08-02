@@ -1,0 +1,661 @@
+/* ------------------------------------------------------------------
+   Landing page.
+
+   The whole page is built on one idea: a spec sheet for a piece of
+   infrastructure. Hairline rules, mono labels in the margin, numbered
+   sections, no rounded pastel cards. The two products are told apart
+   by hue alone — indigo for Runtime, teal for Loupe — which is why
+   almost nothing here names a colour directly; blocks set
+   [data-product] and inherit.
+   ------------------------------------------------------------------ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--kr-ink);
+  color: var(--kr-text);
+  font-family: var(--kr-font-display);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  /* A very fine grain over the whole page. Without it the large flat
+     dark areas band on cheap panels and read as flat vector; with it
+     they read as a surface. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background: var(--kr-accent-soft);
+  color: var(--kr-text);
+}
+
+a {
+  color: var(--kr-accent);
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  background: var(--kr-surface-2);
+  color: var(--kr-text);
+  padding: 0.7rem 1rem;
+  border-radius: var(--kr-radius-sm);
+}
+
+.skip-link:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+:focus-visible {
+  outline: 2px solid var(--kr-accent);
+  outline-offset: 3px;
+  border-radius: 3px;
+}
+
+.shell {
+  max-width: var(--kr-measure);
+  margin-inline: auto;
+  padding-inline: var(--kr-gutter);
+}
+
+/* --- Shared type ------------------------------------------------- */
+
+.mono {
+  font-family: var(--kr-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--kr-text-muted);
+}
+
+/* --- Hero -------------------------------------------------------- */
+
+.hero {
+  position: relative;
+  isolation: isolate;
+  padding-block: clamp(4.5rem, 12vh, 8.5rem) clamp(3rem, 7vh, 5rem);
+  border-bottom: 1px solid var(--kr-line);
+  overflow: hidden;
+}
+
+.hero__inner {
+  position: relative;
+  z-index: 1;
+}
+
+.hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--kr-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--kr-text-muted);
+  border: 1px solid var(--kr-line);
+  border-radius: 999px;
+  padding: 0.4rem 0.85rem;
+  background: color-mix(in srgb, var(--kr-surface-1) 70%, transparent);
+}
+
+.hero__eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--kr-teal-400);
+  box-shadow: 0 0 10px var(--kr-teal-400);
+}
+
+/* The headline is the whole argument: line one is Runtime, line two is
+   Loupe, and each is tinted accordingly. Nobody has to be told what the
+   colours mean afterwards. */
+.hero__title {
+  margin: 1.6rem 0 0;
+  font-size: clamp(2.6rem, 7.4vw, 5.25rem);
+  line-height: 0.98;
+  letter-spacing: -0.045em;
+  font-weight: 700;
+  max-width: 16ch;
+}
+
+.hero__title .l1 {
+  display: block;
+  color: var(--kr-text);
+}
+
+.hero__title .l2 {
+  display: block;
+  color: var(--kr-text-faint);
+}
+
+.hero__title em {
+  font-style: normal;
+  color: var(--kr-indigo-400);
+}
+
+.hero__title .l2 em {
+  color: var(--kr-teal-400);
+}
+
+.hero__lede {
+  margin: 1.6rem 0 0;
+  max-width: 58ch;
+  font-size: clamp(1.02rem, 1.35vw, 1.16rem);
+  color: var(--kr-text-muted);
+  line-height: 1.65;
+}
+
+.hero__lede strong {
+  color: var(--kr-text);
+  font-weight: 600;
+}
+
+.hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin-top: 2.1rem;
+}
+
+/* --- Buttons ----------------------------------------------------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--kr-font-mono);
+  font-size: 0.775rem;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  text-decoration: none;
+  padding: 0.72rem 1.15rem;
+  border-radius: var(--kr-radius-sm);
+  border: 1px solid var(--kr-line-strong);
+  color: var(--kr-text);
+  background: transparent;
+  transition:
+    transform 0.18s var(--kr-ease),
+    background 0.18s var(--kr-ease),
+    border-color 0.18s var(--kr-ease),
+    box-shadow 0.18s var(--kr-ease);
+}
+
+.btn:hover,
+.btn:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--kr-accent);
+  background: var(--kr-accent-soft);
+}
+
+.btn--solid {
+  background: var(--kr-accent-strong);
+  border-color: var(--kr-accent-strong);
+  color: #fff;
+  font-weight: 600;
+}
+
+.btn--solid:hover,
+.btn--solid:focus-visible {
+  background: var(--kr-accent-strong);
+  box-shadow: 0 10px 30px -10px var(--kr-accent-strong);
+}
+
+.btn__arrow {
+  transition: transform 0.18s var(--kr-ease);
+}
+
+.btn:hover .btn__arrow {
+  transform: translateX(3px);
+}
+
+/* --- Spec bar ---------------------------------------------------- */
+
+/* Four facts, hairline-separated, in the voice of a datasheet. */
+.specbar {
+  margin-top: 3.2rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  border: 1px solid var(--kr-line);
+  border-radius: var(--kr-radius);
+  overflow: hidden;
+  background: color-mix(in srgb, var(--kr-surface-1) 60%, transparent);
+}
+
+.specbar__cell {
+  padding: 1rem 1.15rem;
+  border-right: 1px solid var(--kr-line);
+}
+
+.specbar__cell:last-child {
+  border-right: 0;
+}
+
+.specbar__k {
+  display: block;
+  font-family: var(--kr-font-mono);
+  font-size: 0.64rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--kr-text-faint);
+}
+
+.specbar__v {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 46rem) {
+  .specbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .specbar__cell:nth-child(2n) {
+    border-right: 0;
+  }
+  .specbar__cell:nth-child(-n + 2) {
+    border-bottom: 1px solid var(--kr-line);
+  }
+}
+
+/* --- Sections ---------------------------------------------------- */
+
+.section {
+  position: relative;
+  padding-block: clamp(4rem, 9vh, 6.5rem);
+  border-bottom: 1px solid var(--kr-line);
+}
+
+/* The numbered marker in the margin. On wide screens it sits outside
+   the text column like a printed section number; below that it folds
+   inline. */
+.section__marker {
+  font-family: var(--kr-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--kr-accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.1rem;
+}
+
+.section__marker::after {
+  content: '';
+  width: clamp(2rem, 8vw, 5rem);
+  height: 1px;
+  background: linear-gradient(90deg, var(--kr-accent), transparent);
+}
+
+.section__title {
+  margin: 0;
+  font-size: clamp(1.9rem, 3.6vw, 2.85rem);
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+  font-weight: 700;
+  max-width: 20ch;
+}
+
+.section__lede {
+  margin: 1.1rem 0 0;
+  max-width: 54ch;
+  color: var(--kr-text-muted);
+  font-size: 1.03rem;
+}
+
+/* --- Product block ----------------------------------------------- */
+
+.product {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  gap: clamp(2rem, 5vw, 4.5rem);
+  /* Items stretch on purpose: the aside's grid area has to be as tall
+     as the copy column for the sticky visual inside it to have
+     anywhere to travel. */
+  align-items: stretch;
+}
+
+/* Loupe's block mirrors Runtime's so the page alternates rather than
+   marching down one side. */
+.product--mirrored .product__copy {
+  order: 2;
+}
+
+@media (max-width: 60rem) {
+  .product {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .product--mirrored .product__copy {
+    order: 0;
+  }
+}
+
+.product__aside {
+  position: relative;
+}
+
+/* The copy column runs much longer than the terminal or screenshot
+   beside it. Pinning the visual keeps it in view for the whole feature
+   list instead of leaving a tall empty gutter. */
+.product__sticky {
+  position: sticky;
+  top: 5.5rem;
+}
+
+@media (max-width: 60rem) {
+  .product__sticky {
+    position: static;
+  }
+}
+
+/* --- Feature list ------------------------------------------------ */
+
+.features {
+  list-style: none;
+  margin: 2.2rem 0 0;
+  padding: 0;
+  border-top: 1px solid var(--kr-line);
+}
+
+.features li {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr);
+  gap: 0.9rem;
+  padding: 0.95rem 0;
+  border-bottom: 1px solid var(--kr-line);
+  transition: background 0.2s var(--kr-ease);
+}
+
+.features li:hover {
+  background: linear-gradient(
+    90deg,
+    var(--kr-accent-soft),
+    transparent 70%
+  );
+}
+
+.features__n {
+  font-family: var(--kr-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: var(--kr-accent);
+  padding-top: 0.2rem;
+}
+
+.features__t {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  display: block;
+}
+
+.features__d {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--kr-text-muted);
+  font-size: 0.93rem;
+  line-height: 1.55;
+}
+
+.features code {
+  font-family: var(--kr-font-mono);
+  font-size: 0.86em;
+  color: var(--kr-accent);
+  background: var(--kr-accent-soft);
+  padding: 0.08em 0.32em;
+  border-radius: 4px;
+}
+
+/* --- Screenshot frame -------------------------------------------- */
+
+.frame {
+  border: 1px solid var(--kr-line);
+  border-radius: var(--kr-radius);
+  overflow: hidden;
+  background: var(--kr-surface-1);
+  box-shadow: 0 30px 70px -32px rgb(0 0 0 / 0.95);
+}
+
+.frame__bar {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--kr-line);
+  background: linear-gradient(180deg, #171c28 0%, #10141d 100%);
+}
+
+.frame__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.28);
+}
+
+.frame__title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--kr-font-mono);
+  font-size: 0.68rem;
+  color: var(--kr-text-faint);
+  margin-right: 2.2rem;
+}
+
+.frame__caption {
+  font-family: var(--kr-font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  color: var(--kr-text-faint);
+  margin-top: 0.75rem;
+  text-align: center;
+}
+
+/* --- Showcase (wide product shot) -------------------------------- */
+
+.showcase__head {
+  max-width: 62ch;
+}
+
+.section__title--wide {
+  max-width: 24ch;
+}
+
+.showcase {
+  margin: clamp(2.2rem, 5vw, 3.5rem) 0 0;
+}
+
+.showcase .frame__caption {
+  text-align: left;
+}
+
+/* Two columns once there is room for them, so six short features do
+   not become a six-screen scroll. */
+.features--split {
+  margin-top: clamp(2.2rem, 5vw, 3.2rem);
+}
+
+@media (min-width: 54rem) {
+  .features--split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(2rem, 4vw, 3.5rem);
+    border-top: 0;
+  }
+
+  .features--split li {
+    border-top: 1px solid var(--kr-line);
+    border-bottom: 0;
+  }
+}
+
+/* --- Download row ------------------------------------------------ */
+
+.dl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.6rem;
+}
+
+.dl a {
+  font-family: var(--kr-font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-decoration: none;
+  color: var(--kr-text-muted);
+  border: 1px solid var(--kr-line);
+  border-radius: 999px;
+  padding: 0.4rem 0.8rem;
+  transition:
+    color 0.16s var(--kr-ease),
+    border-color 0.16s var(--kr-ease);
+}
+
+.dl a:hover,
+.dl a:focus-visible {
+  color: var(--kr-accent);
+  border-color: var(--kr-accent);
+}
+
+/* --- Footer ------------------------------------------------------ */
+
+.footer {
+  padding-block: 3rem 3.5rem;
+}
+
+.footer__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) repeat(
+      auto-fit,
+      minmax(9rem, 1fr)
+    );
+  gap: 2rem;
+}
+
+.footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--kr-text);
+  text-decoration: none;
+}
+
+.footer__tag {
+  margin: 0.8rem 0 0;
+  color: var(--kr-text-faint);
+  font-size: 0.9rem;
+  max-width: 34ch;
+}
+
+.footer__col h2 {
+  font-family: var(--kr-font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--kr-text-faint);
+  margin: 0 0 0.85rem;
+  font-weight: 500;
+}
+
+.footer__col ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.footer__col a {
+  color: var(--kr-text-muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.footer__col a:hover,
+.footer__col a:focus-visible {
+  color: var(--kr-accent);
+}
+
+.footer__base {
+  margin-top: 2.8rem;
+  padding-top: 1.4rem;
+  border-top: 1px solid var(--kr-line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  justify-content: space-between;
+  font-family: var(--kr-font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  color: var(--kr-text-faint);
+}
+
+/* --- Motion ------------------------------------------------------ */
+
+/* Load stagger for the hero: each child declares its own delay via
+   --i, so adding an element does not mean rewriting keyframes. */
+.stagger > * {
+  animation: rise 0.75s var(--kr-ease) both;
+  animation-delay: calc(var(--i, 0) * 90ms);
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.7s var(--kr-ease),
+    transform 0.7s var(--kr-ease);
+}
+
+[data-reveal].is-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stagger > * {
+    animation: none;
+  }
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

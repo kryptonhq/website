@@ -1,0 +1,49 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "astro",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "trailingSlash": true,
+  "redirects": [
+    {
+      "source": "/docs",
+      "destination": "/runtime/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/getting-started/:path*",
+      "destination": "/runtime/getting-started/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/concepts/:path*",
+      "destination": "/runtime/concepts/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/tutorials/:path*",
+      "destination": "/runtime/tutorials/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/operations/:path*",
+      "destination": "/runtime/operations/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/reference/:path*",
+      "destination": "/runtime/reference/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/docs/roadmap",
+      "destination": "/runtime/roadmap/",
+      "permanent": true
+    },
+    {
+      "source": "/docs/:path*",
+      "destination": "/runtime/:path*",
+      "permanent": true
+    }
+  ]
+}

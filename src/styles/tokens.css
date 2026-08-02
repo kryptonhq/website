@@ -1,0 +1,97 @@
+/* ------------------------------------------------------------------
+   Krypton design tokens.
+
+   One palette for the landing page and both docs sections. The two
+   products each own an accent hue — indigo for Runtime, teal for
+   Loupe — so a page announces which manual you are in before you
+   read a word. Everything else is a near-black slate with hairline
+   rules: an instrument panel, not a brochure.
+   ------------------------------------------------------------------ */
+
+:root {
+  /* Brand hues. Indigo is the Krypton mark's own colour. */
+  --kr-indigo-300: #a5b4fc;
+  --kr-indigo-400: #818cf8;
+  --kr-indigo-500: #6366f1;
+  --kr-indigo-600: #4f46e5;
+
+  --kr-teal-300: #5eead4;
+  --kr-teal-400: #2dd4bf;
+  --kr-teal-500: #14b8a6;
+  --kr-teal-600: #0d9488;
+
+  /* Per-product accent aliases. Set on a container to retheme a
+     whole block — see [data-product] below. */
+  --kr-accent: var(--kr-indigo-400);
+  --kr-accent-strong: var(--kr-indigo-500);
+  --kr-accent-soft: rgb(99 102 241 / 0.14);
+
+  /* Neutrals, dark-first. */
+  --kr-ink: #07080b;
+  --kr-surface-1: #0d1017;
+  --kr-surface-2: #141824;
+  --kr-surface-3: #1c2130;
+
+  --kr-text: #e7eaf2;
+  --kr-text-muted: #8a93a9;
+  --kr-text-faint: #5b6377;
+
+  --kr-line: rgb(139 152 181 / 0.16);
+  --kr-line-strong: rgb(139 152 181 / 0.3);
+
+  /* Type. Archivo is a tight industrial grotesk that holds up at
+     display sizes; JetBrains Mono carries every label, badge and
+     command so the technical voice stays consistent. */
+  --kr-font-display: 'Archivo Variable', 'Archivo', -apple-system,
+    BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --kr-font-mono: 'JetBrains Mono Variable', 'JetBrains Mono',
+    ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Rhythm. */
+  --kr-measure: 1200px;
+  --kr-gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --kr-radius: 14px;
+  --kr-radius-sm: 8px;
+
+  --kr-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Product retheming. Wrap any block in [data-product="loupe"] and its
+   accent, rules and glows switch to teal without touching a rule. */
+[data-product='runtime'] {
+  --kr-accent: var(--kr-indigo-400);
+  --kr-accent-strong: var(--kr-indigo-500);
+  --kr-accent-soft: rgb(99 102 241 / 0.14);
+}
+
+[data-product='loupe'] {
+  --kr-accent: var(--kr-teal-400);
+  --kr-accent-strong: var(--kr-teal-500);
+  --kr-accent-soft: rgb(45 212 191 / 0.14);
+}
+
+/* Light theme lifts the neutrals but keeps both accents, so the
+   product colour coding survives the toggle in the docs. */
+:root[data-theme='light'] {
+  --kr-accent: var(--kr-indigo-600);
+  --kr-accent-strong: var(--kr-indigo-600);
+  --kr-accent-soft: rgb(99 102 241 / 0.1);
+
+  --kr-ink: #ffffff;
+  --kr-surface-1: #f7f8fb;
+  --kr-surface-2: #eef0f6;
+  --kr-surface-3: #e3e7f0;
+
+  --kr-text: #10131c;
+  --kr-text-muted: #545c70;
+  --kr-text-faint: #7b8398;
+
+  --kr-line: rgb(24 32 56 / 0.12);
+  --kr-line-strong: rgb(24 32 56 / 0.22);
+}
+
+:root[data-theme='light'] [data-product='loupe'] {
+  --kr-accent: var(--kr-teal-600);
+  --kr-accent-strong: var(--kr-teal-600);
+  --kr-accent-soft: rgb(13 148 136 / 0.1);
+}
