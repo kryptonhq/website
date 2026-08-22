@@ -659,3 +659,78 @@ img {
     transition: none;
   }
 }
+
+/* ---- Theme toggle -------------------------------------------------
+   The landing used to be dark unconditionally. It is not any more, so
+   there has to be a way to say which you want — and it writes the same
+   localStorage key Starlight's own picker uses, so the choice survives
+   the walk into the documentation. */
+.theme-toggle {
+  position: fixed;
+  top: 1.15rem;
+  right: 1.15rem;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--kr-line);
+  border-radius: 999px;
+  background: var(--kr-surface-1);
+  color: var(--kr-text-muted);
+  cursor: pointer;
+  transition:
+    color 160ms var(--kr-ease),
+    border-color 160ms var(--kr-ease),
+    background 160ms var(--kr-ease);
+}
+
+.theme-toggle:hover,
+.theme-toggle:focus-visible {
+  color: var(--kr-text);
+  border-color: var(--kr-line-strong);
+  background: var(--kr-surface-2);
+}
+
+/* One icon at a time: the sun means "you are in the dark, this takes
+   you to light", which is the way round every OS does it. */
+.theme-toggle__sun {
+  display: block;
+}
+
+.theme-toggle__moon {
+  display: none;
+}
+
+:root[data-theme='light'] .theme-toggle__sun {
+  display: none;
+}
+
+:root[data-theme='light'] .theme-toggle__moon {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-toggle {
+    transition: none;
+  }
+}
+
+/* The Krypton mark ships in two inks — white for dark backgrounds,
+   indigo for light. Both are rendered and CSS picks, because a single
+   file loses the mark entirely on half the themes.
+
+   These live here rather than in Footer.astro because that component
+   has no style block of its own; all of its styling is in this file. */
+.footer__mark--light {
+  display: none;
+}
+
+:root[data-theme='light'] .footer__mark--dark {
+  display: none;
+}
+
+:root[data-theme='light'] .footer__mark--light {
+  display: inline-block;
+}

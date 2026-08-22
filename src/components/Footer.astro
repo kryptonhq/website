@@ -1,5 +1,6 @@
 ---
-import mark from '../assets/mark-dark.svg';
+import markDark from '../assets/mark-dark.svg';
+import markLight from '../assets/mark-light.svg';
 
 const year = new Date().getFullYear();
 ---
@@ -9,11 +10,12 @@ const year = new Date().getFullYear();
     <div class="footer__grid">
       <div>
         <a class="footer__brand" href="/">
-          <img src={mark.src} alt="" width="24" height="24" />
+          <img class="footer__mark footer__mark--dark" src={markDark.src} alt="" width="24" height="24" />
+          <img class="footer__mark footer__mark--light" src={markLight.src} alt="" width="24" height="24" />
           Krypton
         </a>
         <p class="footer__tag">
-          Open-source projects for Kubernetes, developed on GitHub under
+          Open-source projects for the Cloud, developed on GitHub under
           Apache-2.0.
         </p>
       </div>

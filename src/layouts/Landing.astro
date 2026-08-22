@@ -13,10 +13,11 @@ const { title, description } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
-{/* The landing page is dark, always. It is the one surface where the
-    brand gets to set the mood rather than defer to a reader's toggle —
-    the docs behind it remain fully themeable. */}
-<html lang="en" data-theme="dark">
+{/* Theme is the reader's, here as much as in the docs. The choice is
+    stored under Starlight's own key, so flipping it on the landing
+    carries into the documentation and back again rather than the two
+    surfaces disagreeing. */}
+<html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -25,6 +26,27 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="canonical" href={canonical} />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="generator" content={Astro.generator} />
+
+    {/* Before first paint, or the page flashes the wrong theme. Same
+        key and same values Starlight's own picker writes. */}
+    <script is:inline>
+      (() => {
+        const stored = (() => {
+          try {
+            return localStorage.getItem('starlight-theme');
+          } catch {
+            return null;
+          }
+        })();
+        const theme =
+          stored === 'light' || stored === 'dark'
+            ? stored
+            : window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark';
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
 
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
@@ -37,7 +59,46 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
+
+    <button
+      class="theme-toggle"
+      type="button"
+      aria-label="Switch between light and dark"
+      title="Switch between light and dark"
+    >
+      <svg class="theme-toggle__sun" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.6" fill="currentColor" />
+        <g stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+          <path d="M12 2.6v2.2M12 19.2v2.2M2.6 12h2.2M19.2 12h2.2" />
+          <path d="M5.4 5.4l1.6 1.6M17 17l1.6 1.6M18.6 5.4L17 7M7 17l-1.6 1.6" />
+        </g>
+      </svg>
+      <svg class="theme-toggle__moon" viewBox="0 0 24 24" width="17" height="17" aria-hidden="true">
+        <path
+          d="M20 13.4A8.2 8.2 0 1 1 10.6 4a6.6 6.6 0 0 0 9.4 9.4Z"
+          fill="currentColor"
+        />
+      </svg>
+    </button>
+
     <slot />
+    <script>
+      // The toggle only ever flips between the two explicit values; a
+      // reader who has expressed a preference is not put back on the
+      // system's.
+      const toggle = document.querySelector('.theme-toggle');
+      toggle?.addEventListener('click', () => {
+        const next =
+          document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+        document.documentElement.dataset.theme = next;
+        try {
+          localStorage.setItem('starlight-theme', next);
+        } catch {
+          // Private browsing. The choice still applies to this page.
+        }
+      });
+    </script>
+
     <script>
       // Reveal-on-scroll. Elements opt in with [data-reveal]; the
       // observer only ever adds a class, so with JS off or reduced

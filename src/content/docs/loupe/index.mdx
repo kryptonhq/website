@@ -52,7 +52,8 @@ a CRD installed after the binary was built needs no upgrade to browse.
 ## Install
 
 Loupe ships as a native binary for macOS, Linux and Windows. The current
-release is **v0.1.0**.
+release is **v0.1.5** — see the [release notes](/loupe/releases/) for what
+changed.
 
 <Tabs syncKey="os">
   <TabItem label="macOS" icon="apple">
@@ -71,16 +72,14 @@ Alternatively, download a `.dmg` from the
 built separately rather than as a universal binary, so each download
 contains one slice.
 
-<Aside type="caution" title="First launch requires an additional step">
-macOS builds are ad-hoc signed but not notarised, so Gatekeeper blocks
-the first launch. Either:
+<Aside type="tip" title="Signed and notarised since v0.1.2">
+The macOS builds are signed with a Developer ID and notarised, with the
+ticket stapled, so the app opens on a double-click. There is nothing to
+allow in System Settings and no quarantine attribute to remove.
 
-- open **System Settings → Privacy & Security** and select **Open
-  Anyway**, or
-- install with `brew install --cask --no-quarantine kryptonhq/tap/loupe`.
-
-The cask documents this in its caveats and does not remove the
-quarantine attribute in a `postflight`.
+Loupe also updates itself from v0.1.5 onward, so `brew upgrade` is only
+needed to reach that version. The cask is marked `auto_updates true`;
+pass `--greedy` if you would rather Homebrew drive the upgrade.
 </Aside>
 
   </TabItem>
@@ -139,6 +138,29 @@ The installers are unsigned, so SmartScreen warns on first run. Select
 Connections are held per context, so switching cluster does not restart
 the application or discard the previous connection.
 
+## The workbench
+
+Loupe holds several pieces of work at once rather than one. Opening an
+object does not cost you the list it came from, and following a chain —
+a pod, its ReplicaSet, the Deployment above it — is reversible in both
+directions.
+
+![Two tabs open, with the trail showing the path to a pod](/img/loupe/tabs.png)
+
+- **Tabs.** `⌘T` opens one, `⌘W` closes it, `⌘1`–`⌘9` reach one by
+  position, and `⌘`-clicking a row opens it in a tab of its own.
+- **Back and forward,** per tab, on `⌘[` and `⌘]`. The breadcrumb above
+  a detail view says where the object sits — kind, namespace, name —
+  rather than replaying how you arrived.
+- **A status bar** carrying the cluster, its write guard, the server
+  version and any pending update, on one line that does not move.
+- **Interface zoom** on `⌘+`, `⌘-` and `⌘0`, remembered across
+  launches, from the View menu or the command palette.
+
+Each listing remembers its own namespace, search and sort, so drilling
+into a row and coming back returns the view as you left it — and two
+tabs on the same kind can be scoped to different namespaces.
+
 ## Capabilities
 
 ### Resource browsing
@@ -153,6 +175,12 @@ the application or discard the previous connection.
   and persistent volume claims
 - Custom resources, resolved through API discovery and rendered with
   the printer columns declared in the CRD
+- Sortable columns, in the units the columns are actually in: ages sort
+  as durations, ready counts as fractions, restarts as numbers. A sort
+  over a partly loaded listing says so rather than implying it covered
+  the cluster.
+
+![Deployments listed from the server's own printer columns](/img/loupe/deployments-dark.png)
 
 ### Detail views
 
@@ -164,7 +192,7 @@ the application or discard the previous connection.
   remaining finalizers on a terminating namespace, and the resources it
   contains
 
-![Node detail showing allocated CPU and memory against allocatable](/img/node-detail.png)
+![Node detail showing allocated CPU and memory against allocatable](/img/loupe/pod-detail.png)
 
 ### Logs
 
@@ -181,11 +209,30 @@ the application or discard the previous connection.
 - Release values, rendered manifests, notes and revision history are
   decoded from the release Secrets. The `helm` binary is not invoked.
 
-### Editing
+### Editing and actions
 
 - The YAML view writes back with a full replace, so a concurrent
   modification is rejected by the API server rather than silently
   overwritten
+- A diff is shown before every apply
+- Scale, rollout restart, delete, cordon and drain, behind
+  confirmations — and hidden entirely where RBAC would refuse them
+- Per-context guards: a context can be marked **protected**, so every
+  write is confirmed by typing its name, or **read-only**, so writes
+  are refused outright. The guard is shown in the status bar and tints
+  it, so a production cluster does not look like a local one.
+
+![The manifest view with syntax highlighting](/img/loupe/pod-yaml.png)
+
+### Updates
+
+- Loupe checks once on launch and offers a new version in the status
+  bar. Downloads are verified against a signing key compiled into the
+  binary, so a compromised release host cannot ship an artifact the
+  private key did not sign.
+- Also available from the command palette as **Check for updates**.
+- The `.deb` deliberately does not self-update — the package manager
+  owns those files.
 
 ### Appearance
 
@@ -194,15 +241,16 @@ the application or discard the previous connection.
 
 ## Not yet implemented
 
-As of v0.1.0:
+As of v0.1.5:
 
-- **Deletion.** Intentionally deferred until it can name the objects it
-  will remove in a confirmation step.
-- **`exec` into a container.**
-- **Multiple simultaneous clusters.** One context is connected at a
-  time.
-- **Owner-reference navigation** — from a deployment to its pods, a
-  service to its endpoints, a claim to its volume.
+- **Creating objects.** Loupe edits what already exists; there is no
+  *New*, and no apply from a local file.
+- **Cluster-wide search.** The filter box matches the rows a listing has
+  loaded, not the cluster.
+- **A problems view.** Nothing yet aggregates what is broken across the
+  cluster into one place.
+- **Schema-aware editing.** The YAML editor has no completion and no
+  validation before the apply round-trip.
 
 ## Building from source
 
