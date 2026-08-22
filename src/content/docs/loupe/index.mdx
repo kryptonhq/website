@@ -2,22 +2,6 @@
 title: Loupe
 description: An Apache-2.0 desktop client for Kubernetes, built on the API server's discovery and table-printing endpoints. Installation, capabilities and current limitations.
 topic: loupe
-head:
-  # Retheme this page to Loupe's teal. `:root:root` outweighs the
-  # `:root[data-theme='light']` block in tokens.css regardless of which
-  # stylesheet the bundler emits last.
-  - tag: style
-    content: |
-      :root:root {
-        --kr-accent: var(--kr-teal-400);
-        --kr-accent-strong: var(--kr-teal-500);
-        --kr-accent-soft: rgb(45 212 191 / 0.14);
-      }
-      :root:root[data-theme='light'] {
-        --kr-accent: var(--kr-teal-600);
-        --kr-accent-strong: var(--kr-teal-600);
-        --kr-accent-soft: rgb(13 148 136 / 0.1);
-      }
 ---
 
 import { Tabs, TabItem, Aside, Steps } from '@astrojs/starlight/components';

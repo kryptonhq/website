@@ -56,22 +56,19 @@
   --kr-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Product retheming. Wrap any block in [data-product="loupe"] and its
-   accent, rules and glows switch to teal without touching a rule. */
-[data-product='runtime'] {
+/* Both products share Krypton's indigo. Loupe was themed teal to tell
+   the two apart by hue; each now has a mark of its own, which does that
+   job without a second brand colour to keep in step. The hook is kept
+   so a product can be rethemed in one block if that changes. */
+[data-product='runtime'],
+[data-product='loupe'] {
   --kr-accent: var(--kr-indigo-400);
   --kr-accent-strong: var(--kr-indigo-500);
   --kr-accent-soft: rgb(99 102 241 / 0.14);
 }
 
-[data-product='loupe'] {
-  --kr-accent: var(--kr-teal-400);
-  --kr-accent-strong: var(--kr-teal-500);
-  --kr-accent-soft: rgb(45 212 191 / 0.14);
-}
-
-/* Light theme lifts the neutrals but keeps both accents, so the
-   product colour coding survives the toggle in the docs. */
+/* Light theme lifts the neutrals; the accent is the same indigo in
+   both themes, only darkened enough to hold contrast on white. */
 :root[data-theme='light'] {
   --kr-accent: var(--kr-indigo-600);
   --kr-accent-strong: var(--kr-indigo-600);
@@ -90,8 +87,9 @@
   --kr-line-strong: rgb(24 32 56 / 0.22);
 }
 
+:root[data-theme='light'] [data-product='runtime'],
 :root[data-theme='light'] [data-product='loupe'] {
-  --kr-accent: var(--kr-teal-600);
-  --kr-accent-strong: var(--kr-teal-600);
-  --kr-accent-soft: rgb(13 148 136 / 0.1);
+  --kr-accent: var(--kr-indigo-600);
+  --kr-accent-strong: var(--kr-indigo-600);
+  --kr-accent-soft: rgb(99 102 241 / 0.1);
 }

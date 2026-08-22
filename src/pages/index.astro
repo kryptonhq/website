@@ -141,21 +141,6 @@ const products = [
     transform: translateY(-2px);
   }
 
-  /* Each card carries the accent its own docs use, so clicking through
-     is continuous rather than a colour change.
-
-     Worth noting: Loupe's mark is indigo but its docs are themed teal,
-     which predates the mark. Whichever way that is settled, both ends
-     should move together — here and in the `head` block of
-     content/docs/loupe/index.mdx. */
-  .card[data-product='loupe'] {
-    --kr-accent: var(--kr-teal-400);
-  }
-
-  .card[data-product='runtime'] {
-    --kr-accent: var(--kr-indigo-400);
-  }
-
   .card__mark {
     display: block;
     margin-bottom: 1.1rem;

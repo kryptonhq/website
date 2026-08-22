@@ -44,6 +44,22 @@ export default defineConfig({
       plugins: [
         starlightSidebarTopics([
           {
+            id: 'loupe',
+            label: 'Loupe',
+            link: '/loupe/',
+            icon: 'magnifier',
+            items: [
+              { label: 'Overview', link: '/loupe/' },
+              {
+                label: 'Release notes',
+                // Ordered by each page's `sidebar.order`, newest first,
+                // rather than by filename — which would put 0.1.0 above
+                // 0.1.5 and bury the release anyone is looking for.
+                items: [{ autogenerate: { directory: 'loupe/releases' } }],
+              },
+            ],
+          },
+          {
             id: 'runtime',
             label: 'Runtime',
             link: '/runtime/',
@@ -59,22 +75,6 @@ export default defineConfig({
                 items: [
                   { autogenerate: { directory: 'runtime/getting-started' } },
                 ],
-              },
-            ],
-          },
-          {
-            id: 'loupe',
-            label: 'Loupe',
-            link: '/loupe/',
-            icon: 'magnifier',
-            items: [
-              { label: 'Overview', link: '/loupe/' },
-              {
-                label: 'Release notes',
-                // Ordered by each page's `sidebar.order`, newest first,
-                // rather than by filename — which would put 0.1.0 above
-                // 0.1.5 and bury the release anyone is looking for.
-                items: [{ autogenerate: { directory: 'loupe/releases' } }],
               },
             ],
           },
