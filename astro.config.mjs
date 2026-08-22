@@ -1,5 +1,5 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig, passthroughImageService } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightSidebarTopics from 'starlight-sidebar-topics';
 
@@ -12,6 +12,18 @@ import starlightSidebarTopics from 'starlight-sidebar-topics';
 export default defineConfig({
   site: 'https://www.kryptonhq.com',
   trailingSlash: 'always',
+
+  // No image optimisation. Nothing here asks for it: the marks are SVG,
+  // which Sharp passes through untouched, and the screenshots are served
+  // straight out of public/ at the size they were captured. That left
+  // Sharp being installed and invoked to do nothing.
+  //
+  // The no-op service keeps <Image /> and <Picture /> usable — they
+  // still enforce dimensions and alt text — but performs no transform,
+  // so builds do not depend on a native binary.
+  image: {
+    service: passthroughImageService(),
+  },
   integrations: [
     starlight({
       title: 'Krypton',
