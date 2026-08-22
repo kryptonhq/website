@@ -1,0 +1,32 @@
+---
+title: Release notes
+description: What changed in each release of Loupe, newest first.
+topic: loupe
+sidebar:
+  order: 0
+  # The group above is already called "Release notes"; repeating it
+  # verbatim on the index reads as a duplicate rather than a summary.
+  label: All versions
+---
+
+Every published release, newest first. Loupe follows
+[semantic versioning](https://semver.org), with the caveat that on 0.x
+the middle number carries the weight a major would.
+
+| Version | Date | Summary |
+| --- | --- | --- |
+| [0.1.5](/loupe/releases/0-1-5/) | 21 Aug 2026 | The workbench shell, auto-update, a mark of its own — and everything from three versions that were never published |
+| [0.1.2](/loupe/releases/0-1-2/) | 4 Aug 2026 | Signed and notarised macOS builds |
+| [0.1.1](/loupe/releases/0-1-1/) | 3 Aug 2026 | Test coverage and a security pass |
+| [0.1.0](/loupe/releases/0-1-0/) | 1 Aug 2026 | First release |
+
+Versions 0.1.3 and 0.1.4 exist only as version bumps in the repository
+and were never published; their work shipped in 0.1.5.
+
+From 0.1.5 onward Loupe checks for new versions itself and offers them
+in the status bar. Reaching 0.1.5 from an earlier build needs
+`brew upgrade` or a download.
+
+The canonical source is
+[CHANGELOG.md](https://github.com/kryptonhq/loupe/blob/main/CHANGELOG.md)
+in the repository; these pages mirror it.

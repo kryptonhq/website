@@ -67,7 +67,16 @@ export default defineConfig({
             label: 'Loupe',
             link: '/loupe/',
             icon: 'magnifier',
-            items: [{ label: 'Loupe', link: '/loupe/' }],
+            items: [
+              { label: 'Overview', link: '/loupe/' },
+              {
+                label: 'Release notes',
+                // Ordered by each page's `sidebar.order`, newest first,
+                // rather than by filename — which would put 0.1.0 above
+                // 0.1.5 and bury the release anyone is looking for.
+                items: [{ autogenerate: { directory: 'loupe/releases' } }],
+              },
+            ],
           },
         ]),
       ],
