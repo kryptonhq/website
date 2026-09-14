@@ -192,6 +192,59 @@ tabs on the same kind can be scoped to different namespaces.
 
 ## Capabilities
 
+### Problems
+
+One view of everything currently broken across the cluster, opened from
+the top of the rail, from the status bar's problem count, or as
+**Problems** in the command palette.
+
+- **Pods** — `CrashLoopBackOff` with the last exit code, `ImagePullBackOff`
+  and `ErrImagePull` with the image reference, container configuration
+  errors, `OOMKilled` on the last termination, `Pending` with the
+  scheduler's own reason, not Ready past the grace period, and restarts
+  above a threshold within the last hour
+- **Workloads** — Deployments, StatefulSets and DaemonSets short of
+  their replicas past the grace period, stalled rollouts, failed Jobs,
+  and CronJobs whose last run failed
+- **Nodes** — not Ready, memory, disk and PID pressure, cordoned, and
+  taints that are keeping pending pods off a node they would otherwise
+  fit
+- **Events** — `Warning` events from the last hour, one row per object
+  and reason with a count, so forty identical `FailedScheduling` events
+  are one line
+- **Storage** — claims left `Pending` past the grace period
+
+Rows are ordered worst first, sortable by severity and age, filterable
+by namespace, and open the object they describe. Each tab keeps its own
+sort and namespace.
+
+The view is kept current by watching those kinds — one list per kind
+and then changes — rather than by polling, so a fixed image drops off
+without a refresh. If RBAC does not allow listing one of them, that
+category shows a single "not permitted" row instead of an empty section
+that would read as healthy; the others are unaffected.
+
+What counts as broken rather than still starting is configurable in
+`settings.json`, and applies from the next connection. The file is in
+the application's config directory — `~/Library/Application
+Support/ai.krypton.loupe/` on macOS, `~/.config/ai.krypton.loupe/` on
+Linux, and `%APPDATA%\ai.krypton.loupe\` on Windows:
+
+```json
+{
+  "problems": {
+    "gracePeriodSeconds": 120,
+    "restartThreshold": 5
+  }
+}
+```
+
+The status bar counts critical and warning rows. Warning events and
+unavailable categories appear in the view but not in the count, so a
+busy cluster's badge still means something. Metrics-based problems such
+as CPU throttling are not detected, and nothing is sent anywhere — there
+are no notifications or alerts.
+
 ### Resource browsing
 
 - Kubeconfig context discovery, connection, and switching between
@@ -276,8 +329,6 @@ As of v0.1.5:
   *New*, and no apply from a local file.
 - **Cluster-wide search.** The filter box matches the rows a listing has
   loaded, not the cluster.
-- **A problems view.** Nothing yet aggregates what is broken across the
-  cluster into one place.
 - **Schema-aware editing.** The YAML editor has no completion and no
   validation before the apply round-trip.
 
