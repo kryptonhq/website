@@ -84,6 +84,9 @@ Builds are produced on Ubuntu 22.04. The binary links against the glibc
 of its build host, so building on a newer runner would raise the
 minimum glibc required to start.
 
+Each file has a detached GPG signature beside it in the release — see
+[verifying a download](#verifying-a-download).
+
   </TabItem>
   <TabItem label="Windows" icon="seti:windows">
 
@@ -95,13 +98,51 @@ Download either installer from the
 - `Loupe_<version>_x64_en-US.msi` — the MSI package
 - `Loupe_<version>_x64-setup.exe` — the NSIS installer
 
-<Aside type="caution">
-The installers are unsigned, so SmartScreen warns on first run. Select
-**More info → Run anyway**.
+<Aside type="caution" title="Unsigned — signing planned">
+The installers are not yet Authenticode-signed, so SmartScreen warns on
+first run. Select **More info → Run anyway**. Signing for both the MSI
+and the NSIS installer is planned.
 </Aside>
 
   </TabItem>
 </Tabs>
+
+### Verifying a download
+
+macOS builds are verified by Gatekeeper on open. Linux builds carry a
+detached GPG signature per file — `Loupe_<version>_amd64.deb.asc` beside
+`Loupe_<version>_amd64.deb`, and likewise for the `.rpm` and
+`.AppImage`.
+
+Import the release key, published in the repository at
+[`packaging/linux/loupe-release.asc`](https://github.com/kryptonhq/loupe/blob/main/packaging/linux/loupe-release.asc),
+and check its fingerprint against the one in
+[`packaging/linux/README.md`](https://github.com/kryptonhq/loupe/blob/main/packaging/linux/README.md)
+before trusting it:
+
+```bash
+curl -fsSLO https://raw.githubusercontent.com/kryptonhq/loupe/main/packaging/linux/loupe-release.asc
+gpg --import loupe-release.asc
+```
+
+Then verify whichever format you downloaded:
+
+| Format | Verify |
+| --- | --- |
+| `.deb` | `gpg --verify Loupe_<version>_amd64.deb.asc Loupe_<version>_amd64.deb` |
+| `.rpm` | `gpg --verify Loupe-<version>-1.x86_64.rpm.asc Loupe-<version>-1.x86_64.rpm` |
+| `.AppImage` | `gpg --verify Loupe_<version>_amd64.AppImage.asc Loupe_<version>_amd64.AppImage` |
+
+Look for `Good signature from "Loupe Release Signing"`. The warning that
+the key is not certified with a trusted signature is expected unless you
+have signed the key yourself.
+
+<Aside>
+The `.sig` files in each release are minisign signatures used by the
+built-in updater, not GPG signatures, and do not verify with `gpg`.
+Releases published before Linux signing was introduced have no `.asc`
+files.
+</Aside>
 
 ## First run
 
