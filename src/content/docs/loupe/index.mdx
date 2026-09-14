@@ -116,13 +116,15 @@ detached GPG signature per file — `Loupe_<version>_amd64.deb.asc` beside
 
 Import the release key, published in the repository at
 [`packaging/linux/loupe-release.asc`](https://github.com/kryptonhq/loupe/blob/main/packaging/linux/loupe-release.asc),
-and check its fingerprint against the one in
-[`packaging/linux/README.md`](https://github.com/kryptonhq/loupe/blob/main/packaging/linux/README.md)
+and check that its fingerprint is
+`CC01 D01D 4A8B 455D CC67 EED5 1D2D 0C2A 56D7 8DD0` — the same value is in
+[`packaging/linux/README.md`](https://github.com/kryptonhq/loupe/blob/main/packaging/linux/README.md) —
 before trusting it:
 
 ```bash
 curl -fsSLO https://raw.githubusercontent.com/kryptonhq/loupe/main/packaging/linux/loupe-release.asc
 gpg --import loupe-release.asc
+gpg --fingerprint "Loupe Release Signing"
 ```
 
 Then verify whichever format you downloaded:
