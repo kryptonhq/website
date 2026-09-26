@@ -6,7 +6,10 @@ page and the documentation for two independent open-source projects:
 - **[Krypton Runtime](https://github.com/kryptonhq/runtime)** — Kubernetes-native
   serving for AI agents, self-hosted LLMs and MCP servers. Docs at `/runtime/`.
 - **[Loupe](https://github.com/kryptonhq/loupe)** — an open-source desktop
-  client for Kubernetes. Docs at `/loupe/`.
+  client for Kubernetes. Its docs moved to
+  [loupe.kryptonhq.com](https://loupe.kryptonhq.com), built from the
+  `website/` folder of the Loupe repository; this site keeps its landing
+  card and redirects `/loupe/*` there.
 
 > **The projects are independent.** They share a name, a licence and this
 > domain. Documentation for one must not reference, link into, or
@@ -42,11 +45,10 @@ src/
     docs.css                 re-skins Starlight with the tokens
   content/docs/
     runtime/                 → /runtime/*
-    loupe/                   → /loupe/*
   content.config.ts          Starlight collection + topic schema
 astro.config.mjs             site config, sidebar topics
-vercel.json                  /docs/* → /runtime/* redirects
-public/img/                  Loupe screenshots, brand avatar
+vercel.json                  /docs/* → /runtime/*, /loupe/* → loupe.kryptonhq.com
+public/img/                  brand avatar
 ```
 
 ## How the two products are themed
@@ -82,7 +84,7 @@ in `tokens.css` regardless of stylesheet order.
    description: One line, used for nav and SEO.
    sidebar:
      order: 5
-   topic: runtime      # or loupe — must match a topic id in astro.config.mjs
+   topic: runtime      # must match a topic id in astro.config.mjs
    ---
    ```
 

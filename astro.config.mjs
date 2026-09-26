@@ -3,9 +3,10 @@ import { defineConfig, passthroughImageService } from 'astro/config';
 import starlight from '@astrojs/starlight';
 import starlightSidebarTopics from 'starlight-sidebar-topics';
 
-// Two products share one docs collection. `starlight-sidebar-topics`
-// gives each its own sidebar and a switcher, so /runtime/ and /loupe/
-// read as separate manuals rather than one merged tree.
+// `starlight-sidebar-topics` gives each product its own sidebar and a
+// switcher. Only Runtime is documented here now — Loupe's docs moved to
+// loupe.kryptonhq.com — but the plugin stays so a second manual is one
+// topic away rather than a sidebar rewrite.
 //
 // Note: Starlight's own `sidebar` key must stay unset — the plugin
 // throws if both are configured.
@@ -28,8 +29,8 @@ export default defineConfig({
     starlight({
       title: 'Krypton',
       description:
-        'Documentation for Krypton Runtime and Loupe — two independent ' +
-        'open-source projects for Kubernetes.',
+        'Documentation for Krypton Runtime. Loupe is documented at ' +
+        'loupe.kryptonhq.com.',
       logo: {
         light: './src/assets/mark-light.svg',
         dark: './src/assets/mark-dark.svg',
@@ -55,22 +56,6 @@ export default defineConfig({
       lastUpdated: true,
       plugins: [
         starlightSidebarTopics([
-          {
-            id: 'loupe',
-            label: 'Loupe',
-            link: '/loupe/',
-            icon: 'magnifier',
-            items: [
-              { label: 'Overview', link: '/loupe/' },
-              {
-                label: 'Release notes',
-                // Ordered by each page's `sidebar.order`, newest first,
-                // rather than by filename — which would put 0.1.0 above
-                // 0.1.5 and bury the release anyone is looking for.
-                items: [{ autogenerate: { directory: 'loupe/releases' } }],
-              },
-            ],
-          },
           {
             id: 'runtime',
             label: 'Runtime',

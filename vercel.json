@@ -6,6 +6,21 @@
   "trailingSlash": true,
   "redirects": [
     {
+      "source": "/loupe",
+      "destination": "https://loupe.kryptonhq.com/docs",
+      "permanent": true
+    },
+    {
+      "source": "/loupe/releases/:path*",
+      "destination": "https://loupe.kryptonhq.com/docs/releases/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/loupe/:path*",
+      "destination": "https://loupe.kryptonhq.com/docs",
+      "permanent": true
+    },
+    {
       "source": "/docs",
       "destination": "/runtime/",
       "permanent": true
